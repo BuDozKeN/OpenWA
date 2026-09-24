@@ -1,0 +1,33 @@
+# Repo profile — drafted by agent_init.py on orca-devbox (2026-09-25) from OpenWA
+# (https://github.com/BuDozKeN/OpenWA.git, a fork of rmyndharis/OpenWA); TODOs filled by the attended session.
+# Committed as .agents/profile.yaml in unit #1 (chore/1-framework-bootstrap) on dasupport/main only — main mirrors
+# upstream and stays clean so upstream syncs and upstream PRs never carry framework files.
+# Profiles may add, tailor or mark n/a with a machine-checkable reason — never remove a safeguard.
+repo: OpenWA
+repo_url: github.com/budozken/openwa   # host-neutral binding (R2, v0.20)
+# The setup script lives in Orca Settings › OpenWA › Setup script (the SSOT, checked by preflight R1). No copy is kept
+# here. On orca-devbox: `npm ci` then `npm ci --prefix dashboard`.
+setup_evidence: [node_modules/.package-lock.json, dashboard/node_modules/.package-lock.json]
+stack_candidates: ["TS/NestJS@. (WhatsApp API gateway)", "TS/React+Vite@dashboard/", "SDKs@sdk/ (js, python, php, java; released upstream)"]
+typing: "TypeScript (1096 .ts/.tsx vs 22 .js); nest build + dashboard tsc --noEmit are the type gates"
+tenant_key: n/a
+tenant_key_evidence: >-
+  One deployment per business: the dasupport line runs a single gateway for Corporate Care's Da_Support desk
+  (fork-only image workflow on dasupport-* tags, c417e92e). WhatsApp sessions are scoped per API key inside that one
+  deployment (src/common/security/session-scope.ts), which is T3 below; no second customer shares an instance.
+gates:
+  - "npm run lint"
+  - "npx jest <targeted>"                      # full suite ~40 s
+  - "npm run build"
+  - "npm run typecheck --prefix dashboard"     # when dashboard/ changes; also npm run test --prefix dashboard
+suggested_gates: ["npm run test:scripts (when scripts/ patchers change)"]
+ci: .github/workflows/ci.yml
+tier_floor_paths:                 # adds to the global content rules; never removes
+  T3: ["src/common/security/**", "src/modules/auth/**", "src/core/plugins/**", "src/database/**", "Dockerfile", "docker-entrypoint.sh", "scripts/postinstall.js", "scripts/patch-*", "package.json", "package-lock.json", "dashboard/package.json", "dashboard/package-lock.json", ".github/workflows/**"]
+  T2: ["src/**", "dashboard/src/**"]
+hotspots: ["CLAUDE.md", "CHANGELOG.md"]
+execution_host: orca-devbox
+data_region: AU
+third_parties_to_fault_test: ["WhatsApp (whatsapp-web.js / Baileys engines)", "Chatwoot (via OpenWA-plugins chatwoot-adapter)", "Postgres", "Redis / BullMQ"]
+base_branch_rule: dasupport/main   # main is an upstream mirror; units branch from and merge to dasupport/main
+review_page: false
